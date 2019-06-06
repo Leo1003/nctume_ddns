@@ -5,3 +5,9 @@ authors = ["Leo <leo881003@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+chrono = { version = "^0.4.6", features = ["serde"] }
+env_logger = "^0.6"
+reqwest = "^0.9.14"
+serde = { version = "^1.0.90", features = ["derive"] }
+toml = "^0.5"
+log = "^0.4"
