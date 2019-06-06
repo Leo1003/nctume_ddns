@@ -2,13 +2,25 @@ use crate::error::AppResult;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::ErrorKind;
+use std::time::Duration;
 
 const CONF_FILE: &'static str = "configure.toml";
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ClientConf {
     token: String,
     record_id: u64,
+    update_interval: u64,
+}
+
+impl Default for ClientConf {
+    fn default() -> Self {
+        Self {
+            token: String::new(),
+            record_id: 0,
+            update_interval: 5,
+        }
+    }
 }
 
 impl ClientConf {
@@ -33,6 +45,14 @@ impl ClientConf {
 
     pub fn record_id(&self) -> u64 {
         self.record_id
+    }
+
+    pub fn interval(&self) -> Duration {
+        Duration::from_secs(self.update_interval * 60)
+    }
+
+    pub fn interval_min(&self) -> u64 {
+        self.update_interval
     }
 
     pub fn save(&self) -> AppResult<()> {

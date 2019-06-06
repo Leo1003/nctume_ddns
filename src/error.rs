@@ -62,11 +62,24 @@ impl From<std::io::Error> for AppError {
 
 impl From<toml::ser::Error> for AppError {
     fn from(e: toml::ser::Error) -> Self {
-        Self::with_error("Invalid TOML Format Error", e)
+        Self::with_error("Invalid TOML format Error", e)
     }
 }
 impl From<toml::de::Error> for AppError {
     fn from(e: toml::de::Error) -> Self {
-        Self::with_error("Invalid TOML Format Error", e)
+        Self::with_error("Invalid TOML format Error", e)
     }
 }
+
+impl From<reqwest::Error> for AppError {
+    fn from(e: reqwest::Error) -> Self {
+        Self::with_error("HTTP request Error", e)
+    }
+}
+
+impl From<serde_json::error::Error> for AppError {
+    fn from(e: serde_json::error::Error) -> Self {
+        Self::with_error("JSON format Error", e)
+    }
+}
+
