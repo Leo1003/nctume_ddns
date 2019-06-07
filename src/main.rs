@@ -10,7 +10,11 @@ mod ddns;
 mod error;
 
 fn main() {
-    env_logger::from_env(Env::default().default_filter_or("nctume_ddns")).init();
+    if cfg!(debug_assertions) {
+        env_logger::from_env(Env::default().default_filter_or("nctume_ddns=trace")).init();
+    } else {
+        env_logger::from_env(Env::default().default_filter_or("nctume_ddns=info")).init();
+    }
 
     let conf = configure::ClientConf::load().map_err(|e| {
         error!("{}", e);
