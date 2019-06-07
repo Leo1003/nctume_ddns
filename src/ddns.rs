@@ -17,8 +17,11 @@ pub struct DDnsRecord {
 impl DDnsRecord {
     pub fn init(id: u64, user_token: &str) -> AppResult<Self> {
         let get_url = format!("https://api.nctu.me/records/{}/", id);
-        let token_str = format!("token={}", user_token);
-        let mut respond = Client::new().get(&get_url).body(token_str).send()?.error_for_status()?;
+        if cfg!(debug_assertions) {
+            trace!("URL: {}", &get_url);
+            trace!("Token: {}", &user_token);
+        }
+        let mut respond = Client::new().get(&get_url).query(&[("token", user_token)]).send()?.error_for_status()?;
         let msg: RecordRespond = respond.json()?;
         let msg = msg.msg;
         debug!("Got DNS record: {:?}", msg);
@@ -39,7 +42,7 @@ impl DDnsRecord {
 
     pub fn update(&mut self) -> AppResult<Ipv4Addr> {
         let url = format!("https://api.nctu.me/records/{}/", self.id);
-        let token_str = format!("token={}", self.user_token);
+        //let token_str = format!("token={}", self.user_token);
         let ipaddr = Self::get_ip().map_err(|e| {
             error!("Failed to get current IP address: {:?}", e);
             e
@@ -55,8 +58,8 @@ impl DDnsRecord {
                 r#type: String::from("A"),
                 name: self.name.clone(),
             };
-            let content_string = format!("content={}", serde_json::to_string(&content)?);
-            Client::new().put(&url).body(token_str).body(content_string).send()?.error_for_status()?;
+            //let content_string = format!("content={}", serde_json::to_string(&content)?);
+            Client::new().put(&url).query(&[("content", &content)]).query(&[("token", &self.user_token)]).send()?.error_for_status()?;
             self.last_ip = ipaddr;
             Ok(ipaddr)
         }
