@@ -2,6 +2,8 @@
 ## Rust Gitignore file
 ##
 
+configure.toml
+
 # VS Code Workspace
 *.code-workspace
 .vscode/

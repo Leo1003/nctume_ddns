@@ -10,14 +10,14 @@ pub struct AppError {
 }
 
 impl AppError {
-    fn new(message: &str) -> Self {
+    pub fn new(message: &str) -> Self {
         AppError {
             message: message.to_owned(),
             inner: None,
         }
     }
 
-    fn with_error<E: Error + Send + Sync + 'static>(message: &str, err: E) -> Self {
+    pub fn with_error<E: Error + Send + Sync + 'static>(message: &str, err: E) -> Self {
         AppError {
             message: message.to_owned(),
             inner: Some(err.into()),
@@ -80,6 +80,12 @@ impl From<reqwest::Error> for AppError {
 impl From<serde_json::error::Error> for AppError {
     fn from(e: serde_json::error::Error) -> Self {
         Self::with_error("JSON format Error", e)
+    }
+}
+
+impl From<std::net::AddrParseError> for AppError {
+    fn from(e: std::net::AddrParseError) -> Self {
+        Self::with_error("IP address format Error", e)
     }
 }
 
