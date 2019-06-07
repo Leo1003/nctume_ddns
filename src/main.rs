@@ -30,6 +30,7 @@ fn main() {
         let next_sync = match record.update() {
             Ok(_) => {
                 retries = 0;
+                info!("DDNS update successful");
                 conf.interval()
             },
             Err(e) => {

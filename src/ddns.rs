@@ -58,8 +58,8 @@ impl DDnsRecord {
                 r#type: String::from("A"),
                 name: self.name.clone(),
             };
-            //let content_string = format!("content={}", serde_json::to_string(&content)?);
-            Client::new().put(&url).query(&[("content", &content)]).query(&[("token", &self.user_token)]).send()?.error_for_status()?;
+            let content_string = format!("{}", serde_json::to_string(&content)?);
+            Client::new().put(&url).query(&[("content", &content_string)]).query(&[("token", &self.user_token)]).send()?.error_for_status()?;
             self.last_ip = ipaddr;
             Ok(ipaddr)
         }
