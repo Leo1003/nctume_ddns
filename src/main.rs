@@ -22,7 +22,7 @@ fn main() {
     }
 
     let mut record = ddns::DDnsRecord::init(conf.record_id(), conf.token()).map_err(|e| {
-        error!("Failed to initialize DNS record");
+        error!("Failed to initialize DNS record: {:?}", e);
     }).unwrap();
 
     let mut retries = 0;
@@ -38,7 +38,7 @@ fn main() {
                 if retry_interval.as_secs() > 120 {
                     retry_interval = Duration::from_secs(120);
                 }
-                error!("DDNS update failed");
+                error!("DDNS update failed: {:?}", e);
                 info!("Retry in {} seconds", retry_interval.as_secs());
                 info!("Failed {} times", retries);
                 retry_interval
