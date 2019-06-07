@@ -21,13 +21,20 @@ impl DDnsRecord {
             trace!("URL: {}", &get_url);
             trace!("Token: {}", &user_token);
         }
-        let mut respond = Client::new().get(&get_url).query(&[("token", user_token)]).send()?.error_for_status()?;
+        let mut respond = Client::new()
+            .get(&get_url)
+            .query(&[("token", user_token)])
+            .send()?
+            .error_for_status()?;
         let msg: RecordRespond = respond.json()?;
         let msg = msg.msg;
         debug!("Got DNS record: {:?}", msg);
 
         if msg.content.r#type != "A" {
-            error!("DNS type not match, expected: \"A\", got: \"{}\"", msg.content.r#type);
+            error!(
+                "DNS type not match, expected: \"A\", got: \"{}\"",
+                msg.content.r#type
+            );
             return Err(AppError::new("DNS type not match"));
         }
 
@@ -42,7 +49,6 @@ impl DDnsRecord {
 
     pub fn update(&mut self) -> AppResult<Ipv4Addr> {
         let url = format!("https://api.nctu.me/records/{}/", self.id);
-        //let token_str = format!("token={}", self.user_token);
         let ipaddr = Self::get_ip().map_err(|e| {
             error!("Failed to get current IP address: {:?}", e);
             e
@@ -59,14 +65,23 @@ impl DDnsRecord {
                 name: self.name.clone(),
             };
             let content_string = format!("{}", serde_json::to_string(&content)?);
-            Client::new().put(&url).query(&[("content", &content_string)]).query(&[("token", &self.user_token)]).send()?.error_for_status()?;
+            Client::new()
+                .put(&url)
+                .query(&[("content", &content_string)])
+                .query(&[("token", &self.user_token)])
+                .send()?
+                .error_for_status()?;
             self.last_ip = ipaddr;
             Ok(ipaddr)
         }
     }
 
     fn get_ip() -> AppResult<Ipv4Addr> {
-        let ip_string = Client::new().get("https://api.ipify.org").send()?.error_for_status()?.text()?;
+        let ip_string = Client::new()
+            .get("https://api.ipify.org")
+            .send()?
+            .error_for_status()?
+            .text()?;
         Ok(Ipv4Addr::from_str(&ip_string)?)
     }
 }

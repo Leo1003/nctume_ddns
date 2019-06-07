@@ -28,7 +28,7 @@ impl AppError {
 impl Default for AppError {
     fn default() -> AppError {
         AppError {
-            message: String::from("Unknown Error"), 
+            message: String::from("Unknown Error"),
             inner: None,
         }
     }
@@ -88,4 +88,3 @@ impl From<std::net::AddrParseError> for AppError {
         Self::with_error("IP address format Error", e)
     }
 }
-
