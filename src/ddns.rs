@@ -15,18 +15,19 @@ pub struct DDnsRecord {
 }
 
 impl DDnsRecord {
-    pub fn init(id: u64, user_token: &str) -> AppResult<Self> {
+    pub async fn init(id: u64, user_token: &str) -> AppResult<Self> {
         let get_url = format!("https://api.nctu.me/records/{}/", id);
         if cfg!(debug_assertions) {
             trace!("URL: {}", &get_url);
             trace!("Token: {}", &user_token);
         }
-        let mut respond = Client::new()
+        let respond = Client::new()
             .get(&get_url)
             .query(&[("token", user_token)])
-            .send()?
+            .send()
+            .await?
             .error_for_status()?;
-        let msg: RecordRespond = respond.json()?;
+        let msg: RecordRespond = respond.json().await?;
         let msg = msg.msg;
         debug!("Got DNS record: {:?}", msg);
 
@@ -47,9 +48,9 @@ impl DDnsRecord {
         })
     }
 
-    pub fn update(&mut self) -> AppResult<Ipv4Addr> {
+    pub async fn update(&mut self) -> AppResult<Ipv4Addr> {
         let url = format!("https://api.nctu.me/records/{}/", self.id);
-        let ipaddr = Self::get_ip().map_err(|e| {
+        let ipaddr = Self::get_ip().await.map_err(|e| {
             error!("Failed to get current IP address: {:?}", e);
             e
         })?;
@@ -69,19 +70,22 @@ impl DDnsRecord {
                 .put(&url)
                 .query(&[("content", &content_string)])
                 .query(&[("token", &self.user_token)])
-                .send()?
+                .send()
+                .await?
                 .error_for_status()?;
             self.last_ip = ipaddr;
             Ok(ipaddr)
         }
     }
 
-    fn get_ip() -> AppResult<Ipv4Addr> {
+    async fn get_ip() -> AppResult<Ipv4Addr> {
         let ip_string = Client::new()
             .get("https://api.ipify.org")
-            .send()?
+            .send()
+            .await?
             .error_for_status()?
-            .text()?;
+            .text()
+            .await?;
         Ok(Ipv4Addr::from_str(&ip_string)?)
     }
 }
@@ -136,3 +140,4 @@ mod simple_datetime {
             .map_err(serde::de::Error::custom)
     }
 }
+

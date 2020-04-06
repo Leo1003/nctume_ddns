@@ -9,7 +9,8 @@ mod configure;
 mod ddns;
 mod error;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     if cfg!(debug_assertions) {
         env_logger::from_env(Env::default().default_filter_or("nctume_ddns=trace")).init();
     } else {
@@ -27,7 +28,7 @@ fn main() {
         panic!();
     }
 
-    let mut record = ddns::DDnsRecord::init(conf.record_id(), conf.token())
+    let mut record = ddns::DDnsRecord::init(conf.record_id(), conf.token()).await
         .map_err(|e| {
             error!("Failed to initialize DNS record: {:?}", e);
         })
@@ -35,7 +36,7 @@ fn main() {
 
     let mut retries = 0;
     loop {
-        let next_sync = match record.update() {
+        let next_sync = match record.update().await {
             Ok(_) => {
                 retries = 0;
                 info!("DDNS update successful");
