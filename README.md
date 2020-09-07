@@ -2,6 +2,10 @@
 This is a small dynamic DNS client for the [NCTU.ME](https://nctu.me). 
 The tool is written in Rust which is a new, safe, and fast programming language.
 
+**NOTE**: Since nctu.me is going to retire. This repository is archived and will not be updated.
+
+---
+
 ## Build
 To use this tool, you need to install a rust compiler first. [Install Rust](https://www.rust-lang.org/tools/install)
 Clone this repository
